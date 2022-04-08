@@ -1,0 +1,1 @@
+export const fetchHistryList= async() => await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo`)

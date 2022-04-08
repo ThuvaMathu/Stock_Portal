@@ -10,6 +10,7 @@ export default function Quote() {
     <div>
       <h1>Quote</h1>
       
+      
       </div>
   );
 }
