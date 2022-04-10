@@ -11,7 +11,7 @@ export function useStockRecord() {
         "lastDiv" : 0.85,
         "range" : "105.0-157.26",
         "changes" : 2.4200134,
-        "name" : "Apple Inc.",
+        "companyName" : "Apple Inc.",
         "currency" : "USD",
         "cik" : "0000320193",
         "isin" : "US0378331005",
@@ -41,7 +41,7 @@ export function useStockRecord() {
         "isFund" : false
       },
       {
-        "symbol" : "AAPL",
+        "symbol" : "ADP",
         "price" : 145.85,
         "beta" : 1.201965,
         "volAvg" : 79766736,
@@ -49,7 +49,7 @@ export function useStockRecord() {
         "lastDiv" : 0.85,
         "range" : "105.0-157.26",
         "changes" : 2.4200134,
-        "name" : "Apple Inc.",
+        "companyName" : "Microsoft Inc.",
         "currency" : "USD",
         "cik" : "0000320193",
         "isin" : "US0378331005",

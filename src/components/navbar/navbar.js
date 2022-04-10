@@ -46,6 +46,11 @@ function ResponsiveDrawer(props) {
     Title:'Price History',
     Link:'/history',
     icon: <HistoryIcon/>
+  },
+  {
+    Title:'Company',
+    Link:'/company',
+    icon: <HistoryIcon/>
   }
  
 ]

@@ -6,3 +6,15 @@
 }
 
 /*========================== stock end ====================*/
+
+.content-bold{
+    font-weight: 700 !important;
+}
+.fixwidth{
+    max-height: 300px;
+    overflow: scroll;
+}
+.hide-scroll::-webkit-scrollbar{
+    display: none;
+
+}
