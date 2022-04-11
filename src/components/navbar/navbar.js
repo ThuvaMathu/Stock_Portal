@@ -66,8 +66,8 @@ function ResponsiveDrawer(props) {
       <Divider />
      
         {pages.map((page, index) => (
-          <a href={page.Link} className='nav-menu'>
-          <ListItem button key={page.Title} >
+          <a href={page.Link} className='nav-menu' key={page.Title}>
+          <ListItem button  >
             <ListItemIcon>
               {page.icon}
             </ListItemIcon>

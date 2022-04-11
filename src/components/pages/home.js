@@ -37,7 +37,7 @@ export default function Home() {
   const API_KEY = 'f09e040716cb0920a7927288d97a5067A'
 
   async function getdata() {
-    let url = `https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikeyA=${API_KEY}`
+    let url = `https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=${API_KEY}`
     let res = await fetch(url);
     let data = await res.json();
     setRowdata(data)
@@ -85,8 +85,8 @@ export default function Home() {
     getprofile(id);
     setOpen(true)
   };
-console.log(queryid,"query")
-console.log(profile,"profile")
+//console.log(queryid,"query")
+//console.log(profile,"profile")
 
 
 
@@ -117,7 +117,7 @@ console.log(profile,"profile")
               </TableRow>
             </TableHead>
             <TableBody>
-              {sympole  
+              {sympole 
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (

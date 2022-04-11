@@ -18,3 +18,14 @@
     display: none;
 
 }
+.center-loading{
+    position: relative;
+    height: 80vh;
+}
+.loading-container{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
