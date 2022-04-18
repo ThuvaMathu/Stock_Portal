@@ -18,65 +18,94 @@ import HomeIcon from '@mui/icons-material/Home';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import HistoryIcon from '@mui/icons-material/History';
+import { NavLink } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  //const location = useLocation();
+  //const { pathname } = location;
+  //const splitLocation = pathname.split("/");
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
   const pages = [{
-    Title:'Home',
-    Link:'/',
-    icon: <HomeIcon/>
+    Title: 'Home',
+    Link: '/',
+    icon: <HomeIcon />
   },
   {
-    Title:'Stock',
-    Link:'/stock',
-    icon: <ShowChartIcon/>
+    Title: 'Stock',
+    Link: '/stock',
+    icon: <ShowChartIcon />
   },
   {
-    Title:'Quote',
-    Link:'/quote',
-    icon: <TableChartIcon/>
+    Title: 'Quote',
+    Link: '/quote',
+    icon: <TableChartIcon />
   },
   {
-    Title:'Price History',
-    Link:'/history',
-    icon: <HistoryIcon/>
+    Title: 'Price History',
+    Link: '/history',
+    icon: <HistoryIcon />
   },
   {
-    Title:'Company',
-    Link:'/company',
-    icon: <HistoryIcon/>
+    Title: 'Company',
+    Link: '/company',
+    icon: <HistoryIcon />
+  },
+  {
+    Title: 'Demo',
+    Link: '/demo',
+    icon: <HistoryIcon />
   }
- 
-]
+
+  ]
 
 
   const drawer = (
     <div>
-     <Toolbar>
-          
-         
-        </Toolbar>
-      
+      <Toolbar>
+
+
+      </Toolbar>
+
       <Divider />
-     
-        {pages.map((page, index) => (
-          <a href={page.Link} className='nav-menu' key={page.Title}>
-          <ListItem button  >
-            <ListItemIcon>
-              {page.icon}
-            </ListItemIcon>
+
+    {pages.map((page, index) => (
+          
+          <a  href={page.Link} className='nav-menu' key={page.Title}>
+          <ListItem button>
+            <ListItemIcon>{page.icon}</ListItemIcon>
             <ListItemText primary={page.Title} />
           </ListItem>
           </a>
+         
         ))}
-      
-     
+
+{/* 
+      <ul>
+        <Router>
+          {pages.map((page, index) => (
+            <li>
+              <NavLink to={page.Link} className='nav-menu' key={page.Title}>
+                <ListItem button>
+                  <ListItemIcon>{page.icon}</ListItemIcon>
+                  <ListItemText primary={page.Title} />
+                </ListItem>
+              </NavLink>
+            </li>
+          ))}
+        </Router>
+      </ul> */}
+
+
+
+
     </div>
   );
 
@@ -102,7 +131,7 @@ function ResponsiveDrawer(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h5" noWrap component="div" sx={{color:'white', fontWeight:'500'}}>
+          <Typography variant="h5" noWrap component="div" sx={{ color: 'white', fontWeight: '500' }}>
             Stock Analysis
           </Typography>
         </Toolbar>
@@ -141,7 +170,7 @@ function ResponsiveDrawer(props) {
       </Box>
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }} >
         <Toolbar />
-       <AppRouter/>
+        <AppRouter />
       </Box>
     </Box>
   );

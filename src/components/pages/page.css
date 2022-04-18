@@ -29,3 +29,25 @@
     margin-right: -50%;
     transform: translate(-50%, -50%)
 }
+.active{
+    background-color: red;
+    color: #fff;
+}
+/*========================== Quote  ====================*/
+.quote-search{
+    margin-bottom: 20px;
+}
+.tablehead{
+    font-weight: 700 !important;
+    font-size: 18px !important;
+}
+.react-link{
+    text-decoration: none;
+    background-color: blueviolet;
+    margin-left: 10px;
+    font-size: 15px;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+
+}

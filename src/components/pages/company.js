@@ -18,9 +18,10 @@ const Img = styled('img')({
 
 export default function Company(props) {
 
-  const { sympole } = useStockRecord([]);
-  let temp = sympole[0];
+  const { stockdata } = useStockRecord([]);
+  let temp = stockdata[0];
   const [loading, setLoading] = useState(false);
+
    useEffect(() => {
     if(props?.id?.symbol){
       setLoading(false)
@@ -30,6 +31,7 @@ export default function Company(props) {
       setLoading(false)
     }
    }, [props]);
+
   console.log(props.id, "shankar test")
   if (loading) {
     return <Box sx={{ display: 'flex' }}> <CircularProgress /> </Box>
@@ -39,7 +41,7 @@ export default function Company(props) {
       <Grid container spacing={2}>
         <Grid item>
           <ButtonBase sx={{ width: 128, height: 128 }}>
-            <Img alt="complex" src={sympole[0].image} />
+            <Img alt="complex" src={stockdata[0].image} />
           </ButtonBase>
         </Grid>
         <Grid item xs={12} sm container>
@@ -84,7 +86,7 @@ export default function Company(props) {
           </Grid>
           <Grid item>
             <Typography variant="subtitle1" component="div">
-              price:  {sympole[0].price} {sympole[0].currency}
+              price:  {stockdata[0].price} {stockdata[0].currency}
             </Typography>
           </Grid>
         </Grid>

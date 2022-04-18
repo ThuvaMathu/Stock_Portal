@@ -16,6 +16,7 @@ import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import CircularProgress from '@mui/material/CircularProgress';
+import { Button, TextField } from '@mui/material';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -100,14 +101,19 @@ TableHeader.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-export default function History2() {
+export default function History2(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('1. close');
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rowdata, setRowdata] = useState([]);
+  const [showdata, setShowdata] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { propdata } = props.match.params;
+  const [tempdate, setTempdate] = useState([]);
+  const [searchdate, setSearchdate] = useState();
+
 
   async function getdata() {
     let url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo"
@@ -126,14 +132,21 @@ export default function History2() {
   function dayslist(json, value) {
     let index;
     let arr1 = [];
+    let arr2 = [];
     for (index in json) {
       let date = index.toString();
       arr1.push({ date });
+      arr2.push(date);
     }
+    setTempdate(arr2)
+    //console.log(arr2,"arr2")
     const results = arr1.map((ar, index) =>
-      Object.assign({}, ar, value[index])
+      Object.assign({}, ar, value[index]),
+      
     )
     setRowdata(results)
+    setShowdata(results)
+    
   }
 
   const handleRequestSort = (event, property) => {
@@ -153,8 +166,33 @@ export default function History2() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const handlesearch = () => {
+    if(searchdate != null){
+      console.log(searchdate)
+      //let startDate = new Date("2022-04-01");
+      //let endDate = new Date("2022-04-14");
+      let startDate = new Date(searchdate);
+      let endDate = new Date(Math.max(...rowdata.map(e => new Date(e.date))));
+      var datefilter = showdata.filter(function(x) { return new Date(x.date) >= startDate && new Date(x.date) <= endDate });
+      console.log(datefilter,"filter date");
+      setRowdata(datefilter)
+    }
+    else{
+      setRowdata(showdata)
+    }
+  }
+  
+  const handleclear = () => {
+      setRowdata(showdata)
+  }
+
+
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowdata.length) : 0;
+
+   
+
 
 
   if (loading) {
@@ -162,16 +200,13 @@ export default function History2() {
       <>
         <div className='center-loading'>
           <div className='loading-container'>
-          <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
+            <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
           </div>
-          
+
         </div>
 
       </>
     )
-
-
-
   }
 
 
@@ -180,6 +215,14 @@ export default function History2() {
       <Toolbar>
         <h1>  Price history 2{"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
       </Toolbar>
+
+      <Box className='quote-search'>
+        <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
+        <Button type="button" variant="contained" size='small' color="secondary" onClick={() => handlesearch()} > Search</Button>
+        <Button type="button" variant="contained" size='small' color="secondary" onClick={() => handleclear()} > Clear</Button>
+      </Box>
+
+      <p>Showing Stocks for the {propdata}</p>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader aria-label="sticky table" >

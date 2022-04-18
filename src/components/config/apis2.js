@@ -1,8 +1,6 @@
-import { useState } from "react";
 
 
-export function useStockRecord() {
-    const stockdata = [{
+ export const stockdata = [{
         "symbol" : "AAPL",
         "price" : 145.85,
         "beta" : 1.201965,
@@ -78,7 +76,7 @@ export function useStockRecord() {
         "isAdr" : false,
         "isFund" : false
       } ];
-const sympole = [ {
+export const symbollist = [ {
   "symbol" : "ATVI",
   "name" : "Activision Blizzard",
   "sector" : "Communication Services",
@@ -961,5 +959,4 @@ const sympole = [ {
   "cik" : "0001713683",
   "founded" : "2018-03-16"
 } ]
-    return {stockdata, sympole}
-}
+ 
