@@ -18,9 +18,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import HistoryIcon from '@mui/icons-material/History';
-import { NavLink } from 'react-router-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {
@@ -53,16 +50,7 @@ function ResponsiveDrawer(props) {
     Link: '/history',
     icon: <HistoryIcon />
   },
-  {
-    Title: 'Company',
-    Link: '/company',
-    icon: <HistoryIcon />
-  },
-  {
-    Title: 'Demo',
-    Link: '/demo',
-    icon: <HistoryIcon />
-  }
+ 
 
   ]
 

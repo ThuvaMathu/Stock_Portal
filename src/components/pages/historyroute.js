@@ -16,8 +16,11 @@ import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Button, TextField } from '@mui/material';
-
+import { Button, Grid, TextField } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
+import HistoryIcon from '@mui/icons-material/History';
+import Graph from './graph';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -101,7 +104,7 @@ TableHeader.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-export default function History2(props) {
+export default function Historyroute(props) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('1. close');
   const [page, setPage] = React.useState(0);
@@ -110,13 +113,14 @@ export default function History2(props) {
   const [rowdata, setRowdata] = useState([]);
   const [showdata, setShowdata] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { propdata } = props.match.params;
-  const [tempdate, setTempdate] = useState([]);
+  const { propsymbol, propname} = props.match.params;
   const [searchdate, setSearchdate] = useState();
 
+  const ALP_API_KEY = 'J8R2RN1PX4OKM418'
+  const ALP_API_KEY2 = 'demo'
 
-  async function getdata() {
-    let url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo"
+  async function getdata(sy) {
+    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${ALP_API_KEY2}`
     let res = await fetch(url);
     let data = await res.json();
     dayslist(data['Time Series (Daily)'], Object.values(data['Time Series (Daily)']))
@@ -126,8 +130,8 @@ export default function History2(props) {
 
   useEffect(() => {
     console.log("hello")
-    getdata();
-  }, []);
+    getdata(propsymbol);
+  }, [props]);
 
   function dayslist(json, value) {
     let index;
@@ -138,7 +142,7 @@ export default function History2(props) {
       arr1.push({ date });
       arr2.push(date);
     }
-    setTempdate(arr2)
+    //setTempdate(arr2)
     //console.log(arr2,"arr2")
     const results = arr1.map((ar, index) =>
       Object.assign({}, ar, value[index]),
@@ -212,64 +216,74 @@ export default function History2(props) {
 
   return (
     <>
-      <Toolbar>
-        <h1>  Price history 2{"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
-      </Toolbar>
+     <div className="fix-width">
+      <div>
+        <Box className='quote-search'>
+          <Grid container justifyContent="left" spacing={2}>
+            <Grid item>
+              <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
+            </Grid>
+            <Grid item>
+              <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handlesearch()} > <SearchIcon /> Search</Button>
+            </Grid>
+            <Grid item>
+              <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleclear()} ><ClearIcon /> Clear</Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </div>
 
-      <Box className='quote-search'>
-        <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
-        <Button type="button" variant="contained" size='small' color="secondary" onClick={() => handlesearch()} > Search</Button>
-        <Button type="button" variant="contained" size='small' color="secondary" onClick={() => handleclear()} > Clear</Button>
-      </Box>
-
-      <p>Showing Stocks for the {propdata}</p>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader aria-label="sticky table" >
-            <TableHeader order={order} orderBy={orderBy} onRequestSort={handleRequestSort} rowCount={rowdata.length} />
-            <TableBody>
-              {stableSort(rowdata, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.date}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} >
-                            {value}
-                          </TableCell>
-                        );
-                      })}
+      <p>Showing Stocks for the {propname}</p>
+      <div >
+          <Paper>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader>
+                <TableHeader order={order} orderBy={orderBy} onRequestSort={handleRequestSort} rowCount={rowdata.length} />
+                <TableBody>
+                  {stableSort(rowdata, getComparator(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <TableRow hover role="checkbox" tabIndex={-1} key={row.date}>
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            return (
+                              <TableCell key={column.id} >
+                                {value}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{
+                        height: (dense ? 33 : 53) * emptyRows,
+                      }}
+                    >
+                      <TableCell colSpan={6} />
                     </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, rowdata.length]}
-          component="div"
-          count={rowdata.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, rowdata.length]}
+              component="div"
+              count={rowdata.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+          <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
+          </div>
+          <Box>
+            <Graph data={rowdata} />
+          </Box>
+          </div>
     </>
   );
 }

@@ -7,13 +7,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Button, TextField, Toolbar } from '@mui/material';
+import { Autocomplete, Button, Container, Grid, TextField, Toolbar } from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useStockRecord } from '../config/api';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { symbollist } from '../config/apis2';
 import { Link } from 'react-router-dom';
+import SearchIcon from '@mui/icons-material/Search';
 
 
 export default function Quote() {
@@ -23,9 +24,11 @@ export default function Quote() {
 
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [profile, setProfile] = useState(0);
   const [showdata, setShowdata] = useState(symbollist);
+  const [value, setValue] = useState();
+  const [dropdown, setDropdown] = useState([]);
 
   //const [data, setData] = useState([]);
 
@@ -33,9 +36,8 @@ export default function Quote() {
     { id: 'symbol', label: 'Symbol', minWidth: 100 },
     { id: 'name', label: 'Company Name', minWidth: 100 },
     { id: 'sector', label: 'Industry', minWidth: 100 },
-
-
   ];
+
   const API_KEY = 'f09e040716cb0920a7927288d97a5067A'
 
   async function getdata() {
@@ -44,6 +46,8 @@ export default function Quote() {
     let data = await res.json();
     setRowdata(data)
     setFilterdata(data)
+    setShowdata(data)
+    setdropdata(data)
     if (data.length > 0) { setLoading(false) }
     console.log(data.length, "length")
   }
@@ -52,8 +56,7 @@ export default function Quote() {
     //getdata();
   }, []);
 
-  const [isfiltersymbol, setIsfiltersymbol] = useState(true);
-  const [isfilterindustry, setIsfilterindustry] = useState(true);
+
 
   const searchSymbol = (searchedSymbol) => {
     console.log(profile, "profile length")
@@ -107,6 +110,32 @@ export default function Quote() {
     }
   };
 
+  const handleselect = () => {
+    setProfile(value.length);
+    console.log(searchSymbol, "search test")
+    const filteredRows = rowdata.filter((row) => {
+      return row.sector.toString().toLowerCase().includes(value.toString().toLowerCase());
+    });
+    if (filteredRows.length < 1) {
+      setFilterdata(rowdata)
+    }
+    else {
+      setFilterdata(filteredRows)
+      setShowdata(filteredRows)
+
+    }
+  };
+
+function setdropdata(data){
+  const result = data.filter((thing, index, self) =>
+  index === self.findIndex((t) => (
+    t.sector === thing.sector
+  ))
+)
+setDropdown(result)
+}
+
+
 
   //console.log(filterdata,"filter")
   //console.log(sympole,"symbole")
@@ -129,15 +158,35 @@ export default function Quote() {
       <Toolbar>
         <h1>  Quote {"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
       </Toolbar>
-      <Box className='quote-search'>
-        <TextField id="outlined-basic" label="Search symbole" variant="outlined" onChange={(e) => searchSymbol(e.target.value)} />
-        <TextField id="outlined-basic" label="Search symbole" variant="outlined" onChange={(e) => searchIndustry(e.target.value)} />
+      <Container className='qoute-container'>
+        <Grid container justifyContent="center"  className='quote-search' spacing={3}>
+          <Grid item>
+            <TextField id="outlined-basic" label="Search symbol" variant="outlined" onChange={(e) => searchSymbol(e.target.value)} />
+          </Grid>
+          {/* <Grid item>
+            <TextField id="outlined-basic" label="Search Industries" variant="outlined" onChange={(e) => searchIndustry(e.target.value)} />
+          </Grid> */}
+          
+          <Grid item>
+            <Autocomplete
+              disablePortal
+              autoHighlight
+              getOptionLabel={(option) => option.sector}
+              options={rowdata}
+              sx={{ width: 300 }}
+              onChange={(e, newValue) => { setValue(newValue.sector); }}
+              renderInput={(params) => <TextField {...params} label="Search Industries" />}
+            />
+          </Grid>
+          <Grid item>
+            <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleselect()} > <SearchIcon /> Search industry</Button>
+          </Grid>
+        </Grid>
+        </Container>
 
-      </Box>
-
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Paper>
         <TableContainer component={Paper} sx={{ maxHeight: "700px" }}>
-          <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small" dense table >
+          <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -166,9 +215,7 @@ export default function Quote() {
                         );
                       })}
                       <TableCell >
-
-                        <Button type="button" variant="contained" size='small' color="secondary" tag={Link} to={"/manager/"+ row.name} > Price History → </Button>
-                        <Link className='react-link' to={"/history/"+ row.name}>Link</Link>
+                        <Link className='react-link' to={`/historyroute/${row.symbol},${row.name}`}>Price_History→ </Link>
                       </TableCell>
                     </TableRow>
                   );

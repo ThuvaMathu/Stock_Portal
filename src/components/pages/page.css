@@ -51,3 +51,85 @@
     border-radius: 5px;
 
 }
+.qoute-container{
+    width: 100%;
+}
+
+/*========================== History  ====================*/
+
+.history-button{
+    margin-top: 8px !important;
+    display: block;
+    justify-content: center;
+    height: 40px;
+    
+    align-items: center;
+}
+.margintop10px{
+    margin-top: 40px !important;
+    width: 100%;
+    
+}
+.history{
+   
+}
+.table-flow{
+  display: block;
+    overflow: scroll;
+   
+    
+}
+.table-paper{
+   
+}
+
+.fix-width {
+   
+	width: 100%;
+    overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+/*============== home ==============*/
+.home{
+    position: relative;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif !important;
+    height: 85vh;
+    background-image: url('../../assets/background.png');
+    background-repeat: no-repeat;
+    
+}
+
+.content-container{
+    margin-top: 5%;
+}
+.img-grid{
+    position: relative;
+
+}
+.home-img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    border-radius: 20px;
+    box-shadow: 3px 3px 15px 4px rgba(21,25,180,0.5);
+
+}
+.content{
+    display: block;
+    margin-top: 8%;
+    font-size: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    text-align: justify !important;
+}
+
+/*============== based on Screen ==============*/
+
+@media screen and (max-width: 600px) {
+    .fix-width {
+        width: 340px;
+        
+    }
+  }

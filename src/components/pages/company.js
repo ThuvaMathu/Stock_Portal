@@ -19,7 +19,10 @@ const Img = styled('img')({
 export default function Company(props) {
 
   const { stockdata } = useStockRecord([]);
+  console.log(props?.id)
+ // let temp = props?.id;
   let temp = stockdata[0];
+
   const [loading, setLoading] = useState(false);
 
    useEffect(() => {
@@ -32,7 +35,7 @@ export default function Company(props) {
     }
    }, [props]);
 
-  console.log(props.id, "shankar test")
+  //console.log(props.id, "shankar test")
   if (loading) {
     return <Box sx={{ display: 'flex' }}> <CircularProgress /> </Box>
   }
@@ -41,7 +44,7 @@ export default function Company(props) {
       <Grid container spacing={2}>
         <Grid item>
           <ButtonBase sx={{ width: 128, height: 128 }}>
-            <Img alt="complex" src={stockdata[0].image} />
+            <Img alt="complex" src={temp.image} />
           </ButtonBase>
         </Grid>
         <Grid item xs={12} sm container>
@@ -86,7 +89,7 @@ export default function Company(props) {
           </Grid>
           <Grid item>
             <Typography variant="subtitle1" component="div">
-              price:  {stockdata[0].price} {stockdata[0].currency}
+              price:  {temp.price} {temp.currency}
             </Typography>
           </Grid>
         </Grid>
