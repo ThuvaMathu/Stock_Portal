@@ -23,6 +23,7 @@ import Graph from './graph';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import HistoryIcon from '@mui/icons-material/History';
+import { toast } from 'react-toastify';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -183,15 +184,17 @@ function Pricehistory(props) {
 
 
   const handlesearch = () => {
+    toast.dismiss();
     if (searchdate != null) {
       console.log(searchdate)
-      //let startDate = new Date("2022-04-01");
-      //let endDate = new Date("2022-04-14");
       let startDate = new Date(searchdate);
-      let endDate = new Date(Math.max(...rowdata.map(e => new Date(e.date))));
-      var datefilter = showdata.filter(function (x) { return new Date(x.date) >= startDate && new Date(x.date) <= endDate });
+      let endDate = new Date(Math.max(...showdata.map(e => new Date(e.date))));
+      let datefilter = showdata.filter(function (x) { return new Date(x.date) >= startDate && new Date(x.date) <= endDate });
       console.log(datefilter, "filter date");
       setRowdata(datefilter)
+      if (datefilter < 1) {
+        toast.error("There is No data available from this date")
+      }
     }
     else {
       setRowdata(showdata)
@@ -227,25 +230,27 @@ function Pricehistory(props) {
 
   return (
     <>
-<div className="fix-width">
-      <div>
-        <Box className='quote-search'>
-          <Grid container justifyContent="left" spacing={2}>
-            <Grid item>
-              <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
+      <div className="fix-width">
+        <div>
+          <Box className='quote-search'>
+            <Grid container justifyContent="left" spacing={2}>
+              <Grid item>
+                <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
+              </Grid>
+              <Grid item>
+                <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handlesearch()} > <SearchIcon /> Search</Button>
+              </Grid>
+              <Grid item>
+                <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleclear()} ><ClearIcon /> Clear</Button>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handlesearch()} > <SearchIcon /> Search</Button>
-            </Grid>
-            <Grid item>
-              <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleclear()} ><ClearIcon /> Clear</Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </div>
+          </Box>
+        </div>
+        <Paper>
+          <p>Showing Stocks for the {name}</p>
+        </Paper>
 
-      <p>Showing Stocks for the {name}</p>
-      <div >
+        <div >
           <Paper>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader>
@@ -290,11 +295,11 @@ function Pricehistory(props) {
             />
           </Paper>
           <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
-          </div>
-          <Box>
-            <Graph data={rowdata} />
-          </Box>
-          </div>
+        </div>
+        <Box>
+          <Graph data={rowdata} />
+        </Box>
+      </div>
     </>
   );
 }

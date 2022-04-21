@@ -54,8 +54,8 @@ export default function Graph(props) {
             d = d.toString();
             setLabels(labels => [...labels, d])
             setCloses(closes => [...closes, pro[i]['4. close']])
-            setLow(low => [...low, pro[i]['2. low']])
-            setHigh(high => [...high, pro[i]['3. high']])
+            setLow(low => [...low, pro[i]['3. low']])
+            setHigh(high => [...high, pro[i]['2. high']])
             setVolume(volume => [...volume, pro[i]['5. volume']])
 
 

@@ -15,7 +15,9 @@ import Box from '@mui/material/Box';
 import { symbollist } from '../config/apis2';
 import { Link } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-
+import { toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Graph from './graph';
 
 export default function Quote() {
 
@@ -29,6 +31,7 @@ export default function Quote() {
   const [showdata, setShowdata] = useState(symbollist);
   const [value, setValue] = useState();
   const [dropdown, setDropdown] = useState([]);
+  const [toastopen, setToastopen] = useState(false);
 
   //const [data, setData] = useState([]);
 
@@ -59,11 +62,17 @@ export default function Quote() {
 
 
   const searchSymbol = (searchedSymbol) => {
-    console.log(profile, "profile length")
+  
+    toast.dismiss()
     if (profile > 0) {
       const filteredRows = filterdata.filter((row) => {
         return row.symbol.toString().toLowerCase().includes(searchedSymbol.toString().toLowerCase());
       });
+      if (filteredRows.length <= 0) {
+        console.log(filteredRows.length, " no data found")
+        toast.warn("No stocks could be found for your search");
+        //setToastopen(true)
+      }
       if (searchedSymbol.length < 1) {
 
         setShowdata(filterdata)
@@ -73,12 +82,17 @@ export default function Quote() {
 
 
       }
+
     }
     else {
       const filteredRows = rowdata.filter((row) => {
 
         return row.symbol.toString().toLowerCase().includes(searchedSymbol.toString().toLowerCase());
       });
+      if (filteredRows.length <= 0) {
+        console.log(filteredRows.length, " no data found")
+        toast.warn("No stocks could be found for your search");
+      }
       if (searchedSymbol.length < 1) {
 
         setShowdata(rowdata)
@@ -126,14 +140,14 @@ export default function Quote() {
     }
   };
 
-function setdropdata(data){
-  const result = data.filter((thing, index, self) =>
-  index === self.findIndex((t) => (
-    t.sector === thing.sector
-  ))
-)
-setDropdown(result)
-}
+  function setdropdata(data) {
+    const result = data.filter((thing, index, self) =>
+      index === self.findIndex((t) => (
+        t.sector === thing.sector
+      ))
+    )
+    setDropdown(result)
+  }
 
 
 
@@ -154,87 +168,106 @@ setDropdown(result)
   }
   return (
     <>
+      <div >
+        {/* {
+          toastopen &&
+          <div>
+            <Paper className='toast'> <p>No stocks could be found for your search</p> </Paper>
+          </div>
 
-      <Toolbar>
-        <h1>  Quote {"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
-      </Toolbar>
-      <Container className='qoute-container'>
-        <Grid container justifyContent="center"  className='quote-search' spacing={3}>
-          <Grid item>
-            <TextField id="outlined-basic" label="Search symbol" variant="outlined" onChange={(e) => searchSymbol(e.target.value)} />
-          </Grid>
-          {/* <Grid item>
+        } */}
+        <Toolbar>
+
+          <h1>  Quote {"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
+        </Toolbar>
+
+        <Container className='qoute-container'>
+          <Grid container justifyContent="center" className='quote-search' spacing={3}>
+            <Grid item>
+              <TextField id="outlined-basic" label="Search symbol" variant="outlined" onChange={(e) => searchSymbol(e.target.value)} />
+            </Grid>
+            {/* <Grid item>
             <TextField id="outlined-basic" label="Search Industries" variant="outlined" onChange={(e) => searchIndustry(e.target.value)} />
           </Grid> */}
-          
-          <Grid item>
-            <Autocomplete
-              disablePortal
-              autoHighlight
-              getOptionLabel={(option) => option.sector}
-              options={rowdata}
-              sx={{ width: 300 }}
-              onChange={(e, newValue) => { setValue(newValue.sector); }}
-              renderInput={(params) => <TextField {...params} label="Search Industries" />}
-            />
+
+            <Grid item>
+              <Autocomplete
+                disablePortal
+                autoHighlight
+                getOptionLabel={(option) => option.sector}
+                options={rowdata}
+                sx={{ width: 300 }}
+                onChange={(e, newValue) => { setValue(newValue.sector); }}
+                renderInput={(params) => <TextField {...params} label="Search Industries" />}
+              />
+            </Grid>
+            <Grid item>
+              <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleselect()} > <SearchIcon /> Search industry</Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleselect()} > <SearchIcon /> Search industry</Button>
-          </Grid>
-        </Grid>
         </Container>
 
-      <Paper>
-        <TableContainer component={Paper} sx={{ maxHeight: "700px" }}>
-          <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} className="quote-tablehead tablehead " >
-                    {column.label}
+        <Paper>
+          <TableContainer component={Paper} sx={{ maxHeight: "700px" }}>
+            <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} className="quote-tablehead tablehead " >
+                      {column.label}
+                    </TableCell>
+                  ))}
+                  <TableCell style={{ minWidth: "100px" }} className="quote-tablehead tablehead " >
+                    Action
                   </TableCell>
-                ))}
-                <TableCell style={{ minWidth: "100px" }} className="quote-tablehead tablehead " >
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {showdata
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  return (
-                    <TableRow hover tabIndex={-1} key={row.symbol} className="quote-tablecell">
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} >
-                            {value}
-                          </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {showdata
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => {
+                    return (
+                      <TableRow hover tabIndex={-1} key={row.symbol} className="quote-tablecell">
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} >
+                              {value}
+                            </TableCell>
 
-                        );
-                      })}
-                      <TableCell >
-                        <Link className='react-link' to={`/historyroute/${row.symbol},${row.name}`}>Price_History→ </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
-          component="div"
-          count={filterdata.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                          );
+                        })}
+                        <TableCell >
+                          <Link className='react-link' to={`/historyroute/${row.symbol},${row.name}`}>Price_History→ </Link>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 100]}
+            component="div"
+            count={filterdata.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <ToastContainer
+        position="top-right"
+        autoClose={8000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        draggable={false}
+        pauseOnVisibilityChange
+        closeOnClick
+        pauseOnHover
+      />
 
-
+      </div>
 
     </>
   );

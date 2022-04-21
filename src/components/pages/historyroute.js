@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -21,6 +21,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import HistoryIcon from '@mui/icons-material/History';
 import Graph from './graph';
+import { toast } from 'react-toastify';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -31,6 +32,8 @@ function descendingComparator(a, b, orderBy) {
   }
   return 0;
 }
+
+
 
 function getComparator(order, orderBy) {
   return order === 'desc'
@@ -116,6 +119,8 @@ export default function Historyroute(props) {
   const { propsymbol, propname} = props.match.params;
   const [searchdate, setSearchdate] = useState();
 
+ 
+
   const ALP_API_KEY = 'J8R2RN1PX4OKM418'
   const ALP_API_KEY2 = 'demo'
 
@@ -172,15 +177,18 @@ export default function Historyroute(props) {
   };
 
   const handlesearch = () => {
+    toast.dismiss();
     if(searchdate != null){
       console.log(searchdate)
-      //let startDate = new Date("2022-04-01");
-      //let endDate = new Date("2022-04-14");
       let startDate = new Date(searchdate);
-      let endDate = new Date(Math.max(...rowdata.map(e => new Date(e.date))));
-      var datefilter = showdata.filter(function(x) { return new Date(x.date) >= startDate && new Date(x.date) <= endDate });
+      let endDate = new Date(Math.max(...showdata.map(e => new Date(e.date))));
+      let datefilter = showdata.filter(function(x) { return new Date(x.date) >= startDate && new Date(x.date) <= endDate });
       console.log(datefilter,"filter date");
       setRowdata(datefilter)
+      if(datefilter < 1){
+        toast.error("There is No data available from this date")
+      }
+      
     }
     else{
       setRowdata(showdata)
@@ -216,12 +224,12 @@ export default function Historyroute(props) {
 
   return (
     <>
-     <div className="fix-width">
+     <div>
       <div>
         <Box className='quote-search'>
           <Grid container justifyContent="left" spacing={2}>
             <Grid item>
-              <TextField label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
+              <TextField  className="date-id" label="Search Date From" color="success" type="date" focused onChange={(e) => setSearchdate(e.target.value)} />
             </Grid>
             <Grid item>
               <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handlesearch()} > <SearchIcon /> Search</Button>
@@ -233,7 +241,10 @@ export default function Historyroute(props) {
         </Box>
       </div>
 
-      <p>Showing Stocks for the {propname}</p>
+      <Paper className='show-stock'>
+      <p>Showing Stocks for the <span>{propname}</span> </p>
+        </Paper>
+      
       <div >
           <Paper>
             <TableContainer sx={{ maxHeight: 440 }}>

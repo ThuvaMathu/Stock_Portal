@@ -55,7 +55,25 @@
     width: 100%;
 }
 
+.toast{
+    
+   margin-top: 0px;
+    width: 100%;
+    height: 25px;
+    z-index: 1;
+}
+.toast p{
+    text-align: center;
+    margin: 1px;
+    background-color:rgb(240, 245, 98);
+    
+}
+
+
+
 /*========================== History  ====================*/
+
+
 
 .history-button{
     margin-top: 8px !important;
@@ -89,6 +107,25 @@
     overflow: scroll;
 	-webkit-overflow-scrolling: touch;
 }
+.show-stock{
+    margin-bottom: 15px;
+    text-align: center;
+    
+    background-color:aquamarine !important;
+    height: 40px;
+    
+}
+.show-stock p{
+    padding: 5px;
+   font-size: 20px;
+}
+.show-stock span{
+    font-weight: 700;
+   color: blue;
+}
+
+
+
 /*============== home ==============*/
 .home{
     position: relative;
@@ -96,7 +133,6 @@
     height: 85vh;
     background-image: url('../../assets/background.png');
     background-repeat: no-repeat;
-    
 }
 
 .content-container{

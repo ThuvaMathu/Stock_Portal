@@ -18,6 +18,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import HistoryIcon from '@mui/icons-material/History';
+import { ToastContainer} from "react-toastify";
+
+
 const drawerWidth = 240;
 
 function ResponsiveDrawer(props) {
@@ -100,6 +103,7 @@ function ResponsiveDrawer(props) {
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
+    <>
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
@@ -161,6 +165,18 @@ function ResponsiveDrawer(props) {
         <AppRouter />
       </Box>
     </Box>
+    <ToastContainer
+        position="top-right"
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        draggable={false}
+        pauseOnVisibilityChange
+        closeOnClick
+        pauseOnHover
+      />
+
+    </>
   );
 }
 
