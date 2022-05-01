@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -14,7 +14,6 @@ import Paper from '@mui/material/Paper';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Button, Grid, TextField } from '@mui/material';
 import { symbollist } from '../config/apis2';
@@ -24,6 +23,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import HistoryIcon from '@mui/icons-material/History';
 import { toast } from 'react-toastify';
+import { StyledTableRow } from './tableextra';
+import swr from '../../assets/swr.png';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -54,6 +55,7 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+
 const columns = [
   { id: 'date', label: 'Date', minWidth: 100 },
   { id: '1. open', label: 'Open', minWidth: 100 },
@@ -81,6 +83,7 @@ function TableHeader(props) {
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
+            className="tableheader"
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -111,7 +114,7 @@ TableHeader.propTypes = {
 
 
 
-//===========================================Price history
+//--------Price history----------
 
 function Pricehistory(props) {
   const [order, setOrder] = React.useState('asc');
@@ -123,27 +126,40 @@ function Pricehistory(props) {
   const [showdata, setShowdata] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchdate, setSearchdate] = useState();
+  const [showerror, setShowerror] = useState(false);
 
-  const ALP_API_KEY = 'J8R2RN1PX4OKM418'
-  const ALP_API_KEY2 = 'demo'
+
+  const API_KEY = 'J8R2RN1PX4OKM418'
+  const API_KEY2 = 'demo'
 
   const { id, name } = props;
 
   async function getdata(sy) {
     console.log(id, "demmo id")
-    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${ALP_API_KEY2}`
-    let res = await fetch(url);
-    let data = await res.json();
-    dayslist(data['Time Series (Daily)'], Object.values(data['Time Series (Daily)']))
-    setLoading(false)
-
-    return data;
+    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${sy}&apikey=${API_KEY}`
+    try {
+      let res = await fetch(url);
+      let data = await res.json();
+      dayslist(data['Time Series (Daily)'], Object.values(data['Time Series (Daily)']));
+      let temp = Object.values(data['Time Series (Daily)'])
+      //console.log(temp.length, "error length")
+      if (temp.length > 1) { setLoading(false) }
+      else {
+        setShowerror(true)
+        toast.warn('There is no data available to display.');
+        setLoading(false)
+      }
+    }
+    catch (err) {
+      setShowerror(true)
+      toast.error('There was an issue with retrieving data from the server.');
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
     setLoading(true)
     getdata(id);
-    //console.log(props,"demmo")
   }, [props]);
 
   function dayslist(json, value) {
@@ -155,7 +171,6 @@ function Pricehistory(props) {
       arr1.push({ date });
       arr2.push(date);
     }
-    //console.log(arr2,"arr2")
     const results = arr1.map((ar, index) =>
       Object.assign({}, ar, value[index]),
 
@@ -169,6 +184,7 @@ function Pricehistory(props) {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
@@ -182,6 +198,8 @@ function Pricehistory(props) {
     setPage(0);
   };
 
+  const emptyRows =
+  page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowdata.length) : 0;
 
   const handlesearch = () => {
     toast.dismiss();
@@ -205,14 +223,6 @@ function Pricehistory(props) {
     setRowdata(showdata)
   }
 
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rowdata.length) : 0;
-
-
-
-
-
   if (loading) {
     return (
       <>
@@ -220,17 +230,24 @@ function Pricehistory(props) {
           <div className='loading-container'>
             <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
           </div>
-
         </div>
-
       </>
     )
   }
-
-
+  if (showerror) {
+    return (
+      <>
+        <div className='center-loading'>
+          <div className='error-container'>
+            <img alt='...' src={swr} className="errorimg" />
+          </div>
+        </div>
+      </>
+    )
+  }
   return (
     <>
-      <div className="fix-width">
+      <div >
         <div>
           <Box className='quote-search'>
             <Grid container justifyContent="left" spacing={2}>
@@ -246,21 +263,21 @@ function Pricehistory(props) {
             </Grid>
           </Box>
         </div>
-        <Paper>
-          <p>Showing Stocks for the {name}</p>
+        <Paper className="show-stock">
+          <p>Showing Stocks for the <span>{name}</span> </p>
         </Paper>
 
-        <div >
-          <Paper>
-            <TableContainer sx={{ maxHeight: 440 }}>
-              <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader>
+        <div className='table-container' >
+          <Paper className='table-paper'>
+            <TableContainer className='table'>
+              <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'} stickyHeader >
                 <TableHeader order={order} orderBy={orderBy} onRequestSort={handleRequestSort} rowCount={rowdata.length} />
                 <TableBody>
                   {stableSort(rowdata, getComparator(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
                       return (
-                        <TableRow hover role="checkbox" tabIndex={-1} key={row.date}>
+                        <StyledTableRow hover role="checkbox" tabIndex={-1} key={row.date}>
                           {columns.map((column) => {
                             const value = row[column.id];
                             return (
@@ -269,7 +286,7 @@ function Pricehistory(props) {
                               </TableCell>
                             );
                           })}
-                        </TableRow>
+                        </StyledTableRow>
                       );
                     })}
                   {emptyRows > 0 && (
@@ -293,8 +310,13 @@ function Pricehistory(props) {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
+
+            <div className='dense' >
+              <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
+            </div>
           </Paper>
-          <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
+
+
         </div>
         <Box>
           <Graph data={rowdata} />
@@ -304,39 +326,54 @@ function Pricehistory(props) {
   );
 }
 
-
-
-
-
-
-
-
-
-
-
 export default function History(props) {
 
+  const { propsymbol, propname } = props.match.params;
   const [searchname, setSearchname] = useState();
-  const [showdata, setShowdata] = useState(symbollist);
-  const [loading, setLoading] = useState(false);
+  const [showdata, setShowdata] = useState();
+  const [loading, setLoading] = useState(true);
   const [value, setValue] = useState();
   const [open, setOpen] = useState(false);
+  const [showerror, setShowerror] = useState(false);
 
-  const API_KEY = 'f09e040716cb0920a7927288d97a5067A'
+
+  const API_KEY = 'f09e040716cb0920a7927288d97a5067'
+
+  useEffect(() => {
+   // console.log(Object.values.props,"prop length")
+      //;
+      if (propname){
+        setLoading(false)
+      }
+      else{
+        getdata()
+      }
+    
+    
+  }, [props]);
 
   async function getdata() {
+    console.log("hit")
     let url = `https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=${API_KEY}`
+    try{
     let res = await fetch(url);
     let data = await res.json();
     setShowdata(data)
     if (data.length > 0) { setLoading(false) }
-    console.log(data.length, "length")
+      else {
+        setShowerror(true)
+        toast.warn('There is no data available to display.');
+        setLoading(false)
+      }
+    }
+    catch (err) {
+      setShowerror(true)
+      toast.error('There was an issue with retrieving data from the server.');
+      setLoading(false)
+      //console.log(error, "error length")
+    }
   }
-  useEffect(() => {
-    //console.log("hello")
-    //getdata();
-  }, []);
-
+   
   const handleselect = () => {
     if (value != null) {
       setOpen(true)
@@ -345,54 +382,102 @@ export default function History(props) {
     }
   }
 
+  if (!propname) {
 
-  if (loading) {
+
+    if (loading) {
+      return (
+        <>
+          <div className='center-loading'>
+            <div className='loading-container'>
+              <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
+            </div>
+
+          </div>
+
+        </>
+      )
+    }
+    if (showerror) {
+      return (
+        <>
+          <div className='center-loading'>
+            <div className='error-container'>
+              <img alt='...' src={swr} className="errorimg" />
+            </div>
+          </div>
+        </>
+      )
+    }
     return (
       <>
-        <div className='center-loading'>
-          <div className='loading-container'>
-            <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
+        <div>
+          <Toolbar>
+            <h1>  Price history {"\u00a0\u00a0"}</h1> < HistoryIcon className='stock-head' />
+          </Toolbar>
+
+          <Box className='quote-search'>
+            <Grid container justifyContent="center" spacing={1}>
+              <Grid item>
+                <Autocomplete
+                  disablePortal
+                  autoHighlight
+                  getOptionLabel={(option) => option.name}
+                  options={showdata}
+                  sx={{ width: 300 }}
+                  onChange={(event, newValue) => { setValue(newValue.symbol); setSearchname(newValue.name); setOpen(false) }}
+                  renderInput={(params) => <TextField {...params} label="Search symbol" />}
+                />
+              </Grid>
+              <Grid item>
+                <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleselect()} > <SearchIcon /> Search </Button>
+              </Grid>
+            </Grid>
+          </Box>
+          <hr />
+
+          <div className='margintop10px'>
+            {open &&
+              <Pricehistory id={value} name={searchname} />
+            }
           </div>
+
+
+        </div>
+      </>
+    );
+  }
+  else {
+
+    if (loading) {
+      return (
+        <>
+          <div className='center-loading'>
+            <div className='loading-container'>
+              <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
+            </div>
+
+          </div>
+
+        </>
+      )
+    }
+    return (
+      <>
+        <Toolbar>
+          <h1>  Price history {"\u00a0\u00a0"}</h1> < HistoryIcon className='stock-head' />
+        </Toolbar>
+
+
+        <hr />
+
+        <div className='margintop10px'>
+
+          <Pricehistory id={propsymbol} name={propname} />
 
         </div>
 
       </>
-    )
+    );
   }
-  return (
-    <>
-      <Toolbar>
-        <h1>  Price history 2{"\u00a0\u00a0"}</h1> < HistoryIcon className='stock-head' />
-      </Toolbar>
-
-      <Box className='quote-search'>
-        <Grid container justifyContent="center" spacing={1}>
-          <Grid item>
-            <Autocomplete
-              disablePortal
-              autoHighlight
-              getOptionLabel={(option) => option.name}
-              options={showdata}
-              sx={{ width: 300 }}
-              onChange={(event, newValue) => { setValue(newValue.symbol); setSearchname(newValue.name); setOpen(false) }}
-              renderInput={(params) => <TextField {...params} label="Search symbol" />}
-            />
-          </Grid>
-          <Grid item>
-            <Button type="button" variant="contained" size='small' color="secondary" className='history-button' onClick={() => handleselect()} > <SearchIcon /> Search </Button>
-          </Grid>
-        </Grid>
-      </Box>
-      <hr />
-
-      <div className='margintop10px'>
-        {open &&
-          <Pricehistory id={value} name={searchname} />
-        }
-      </div>
-      <div>
-
-      </div>
-    </>
-  );
 }

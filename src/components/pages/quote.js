@@ -7,33 +7,33 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Autocomplete, Button, Container, Grid, TextField, Toolbar } from '@mui/material';
+import { Autocomplete, Button, Container, Divider, Grid, TextField, Toolbar } from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import { useStockRecord } from '../config/api';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { symbollist } from '../config/apis2';
 import { Link } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import { toast, ToastContainer} from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Graph from './graph';
+import { StyledTableRow } from './tableextra';
+import spaceimg from '../../assets/swr.png'
+
+
 
 export default function Quote() {
 
-  const [rowdata, setRowdata] = useState(symbollist);
-  const [filterdata, setFilterdata] = useState(symbollist)
+  const [rowdata, setRowdata] = useState();
+  const [filterdata, setFilterdata] = useState()
+  const [showdata, setShowdata] = useState();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [profile, setProfile] = useState(0);
-  const [showdata, setShowdata] = useState(symbollist);
-  const [value, setValue] = useState();
+  const [value, setValue] = useState('');
   const [dropdown, setDropdown] = useState([]);
-  const [toastopen, setToastopen] = useState(false);
+  const [showerror, setShowerror] = useState(false);
 
-  //const [data, setData] = useState([]);
 
   const columns = [
     { id: 'symbol', label: 'Symbol', minWidth: 100 },
@@ -41,28 +41,39 @@ export default function Quote() {
     { id: 'sector', label: 'Industry', minWidth: 100 },
   ];
 
-  const API_KEY = 'f09e040716cb0920a7927288d97a5067A'
+  const API_KEY = 'f09e040716cb0920a7927288d97a5067'
 
   async function getdata() {
     let url = `https://financialmodelingprep.com/api/v3/nasdaq_constituent?apikey=${API_KEY}`
-    let res = await fetch(url);
-    let data = await res.json();
-    setRowdata(data)
-    setFilterdata(data)
-    setShowdata(data)
-    setdropdata(data)
-    if (data.length > 0) { setLoading(false) }
-    console.log(data.length, "length")
+    try {
+      let res = await fetch(url);
+      let data = await res.json();
+      setRowdata(data);
+      setFilterdata(data);
+      setShowdata(data);
+      setdropdata(data);
+      if (data.length > 0) { setLoading(false) }
+      else {
+        setShowerror(true)
+        toast.warn('There is no data available to display.');
+        setLoading(false)
+      }
+    }
+    catch (err) {
+      setShowerror(true)
+      toast.error('There was an issue with retrieving data from the server.');
+      setLoading(false)
+
+    }
+
   }
+
+
   useEffect(() => {
-    console.log("hello")
-    //getdata();
+    getdata();
   }, []);
 
-
-
   const searchSymbol = (searchedSymbol) => {
-  
     toast.dismiss()
     if (profile > 0) {
       const filteredRows = filterdata.filter((row) => {
@@ -71,7 +82,6 @@ export default function Quote() {
       if (filteredRows.length <= 0) {
         console.log(filteredRows.length, " no data found")
         toast.warn("No stocks could be found for your search");
-        //setToastopen(true)
       }
       if (searchedSymbol.length < 1) {
 
@@ -79,10 +89,7 @@ export default function Quote() {
       }
       else {
         setShowdata(filteredRows)
-
-
       }
-
     }
     else {
       const filteredRows = rowdata.filter((row) => {
@@ -99,34 +106,15 @@ export default function Quote() {
       }
       else {
         setShowdata(filteredRows)
-
-
       }
     }
   };
 
 
-  const searchIndustry = (searchedInd) => {
-    console.log(searchedInd.length, "profile length 22")
-
-    setProfile(searchedInd.length);
-    console.log(searchSymbol, "search test")
-    const filteredRows = rowdata.filter((row) => {
-      return row.sector.toString().toLowerCase().includes(searchedInd.toString().toLowerCase());
-    });
-    if (searchedInd.length < 1) {
-      setFilterdata(rowdata)
-    }
-    else {
-      setFilterdata(filteredRows)
-      setShowdata(filteredRows)
-
-    }
-  };
 
   const handleselect = () => {
     setProfile(value.length);
-    console.log(searchSymbol, "search test")
+    console.log(profile, "search test")
     const filteredRows = rowdata.filter((row) => {
       return row.sector.toString().toLowerCase().includes(value.toString().toLowerCase());
     });
@@ -136,7 +124,6 @@ export default function Quote() {
     else {
       setFilterdata(filteredRows)
       setShowdata(filteredRows)
-
     }
   };
 
@@ -149,11 +136,6 @@ export default function Quote() {
     setDropdown(result)
   }
 
-
-
-  //console.log(filterdata,"filter")
-  //console.log(sympole,"symbole")
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -164,18 +146,32 @@ export default function Quote() {
   };
 
   if (loading) {
-    return <Box sx={{ display: 'flex' }}> <CircularProgress /> </Box>
+    return (
+      <>
+        <div className='center-loading'>
+          <div className='loading-container'>
+            <Box sx={{ display: 'flex' }}> <CircularProgress color="secondary" /> </Box>
+          </div>
+
+        </div>
+
+      </>
+    )
+  }
+  if (showerror) {
+    return (
+      <>
+        <div className='center-loading'>
+          <div className='error-container'>
+            <img alt='...' src={spaceimg} className="errorimg" />
+          </div>
+        </div>
+      </>
+    )
   }
   return (
     <>
       <div >
-        {/* {
-          toastopen &&
-          <div>
-            <Paper className='toast'> <p>No stocks could be found for your search</p> </Paper>
-          </div>
-
-        } */}
         <Toolbar>
 
           <h1>  Quote {"\u00a0\u00a0"}</h1> < ShowChartIcon className='stock-head' />
@@ -186,19 +182,15 @@ export default function Quote() {
             <Grid item>
               <TextField id="outlined-basic" label="Search symbol" variant="outlined" onChange={(e) => searchSymbol(e.target.value)} />
             </Grid>
-            {/* <Grid item>
-            <TextField id="outlined-basic" label="Search Industries" variant="outlined" onChange={(e) => searchIndustry(e.target.value)} />
-          </Grid> */}
-
             <Grid item>
               <Autocomplete
-                disablePortal
+
                 autoHighlight
-                getOptionLabel={(option) => option.sector}
-                options={rowdata}
+                options={dropdown.map((option) => option.sector)}
                 sx={{ width: 300 }}
-                onChange={(e, newValue) => { setValue(newValue.sector); }}
-                renderInput={(params) => <TextField {...params} label="Search Industries" />}
+                inputValue={value}
+                onInputChange={(event, newInputValue) => { setValue(newInputValue); }}
+                renderInput={(params) => <TextField{...params} label="Search industries" />}
               />
             </Grid>
             <Grid item>
@@ -207,17 +199,18 @@ export default function Quote() {
           </Grid>
         </Container>
 
-        <Paper>
-          <TableContainer component={Paper} sx={{ maxHeight: "700px" }}>
-            <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="small">
-              <TableHead>
-                <TableRow>
+        <Divider />
+        <Paper className='table-paper table-margin' >
+          <TableContainer component={Paper} sx={{ maxHeight: "700px" }} className='table'>
+            <Table stickyHeader aria-label="sticky table" sx={{ minWidth: 650 }} size="medium" >
+              <TableHead >
+                <TableRow >
                   {columns.map((column) => (
-                    <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} className="quote-tablehead tablehead " >
+                    <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} className="tableheader" >
                       {column.label}
                     </TableCell>
                   ))}
-                  <TableCell style={{ minWidth: "100px" }} className="quote-tablehead tablehead " >
+                  <TableCell style={{ minWidth: "100px" }} className="tableheader" >
                     Action
                   </TableCell>
                 </TableRow>
@@ -227,7 +220,7 @@ export default function Quote() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
                     return (
-                      <TableRow hover tabIndex={-1} key={row.symbol} className="quote-tablecell">
+                      <StyledTableRow hover tabIndex={-1} key={row.symbol} className="quote-tablecell">
                         {columns.map((column) => {
                           const value = row[column.id];
                           return (
@@ -238,9 +231,9 @@ export default function Quote() {
                           );
                         })}
                         <TableCell >
-                          <Link className='react-link' to={`/historyroute/${row.symbol},${row.name}`}>Price_History→ </Link>
+                          <Link className='react-link' to={`/history/${row.symbol},${row.name}`}>Historypro → </Link>
                         </TableCell>
-                      </TableRow>
+                      </StyledTableRow>
                     );
                   })}
               </TableBody>
@@ -256,19 +249,18 @@ export default function Quote() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
+
         <ToastContainer
-        position="top-right"
-        autoClose={8000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        draggable={false}
-        pauseOnVisibilityChange
-        closeOnClick
-        pauseOnHover
-      />
-
+          position="top-right"
+          autoClose={8000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          draggable={false}
+          pauseOnVisibilityChange
+          closeOnClick
+          pauseOnHover
+        />
       </div>
-
     </>
   );
 }

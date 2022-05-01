@@ -76,6 +76,8 @@
         "isAdr" : false,
         "isFund" : false
       } ];
+
+      
 export const symbollist = [ {
   "symbol" : "ATVI",
   "name" : "Activision Blizzard",

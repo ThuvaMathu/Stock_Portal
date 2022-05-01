@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import ButtonBase from '@mui/material/ButtonBase';
-import { useStockRecord } from '../config/api';
 
 const Img = styled('img')({
   margin: 'auto',
@@ -18,15 +17,12 @@ const Img = styled('img')({
 
 export default function Company(props) {
 
-  const { stockdata } = useStockRecord([]);
-  console.log(props?.id)
- // let temp = props?.id;
-  let temp = stockdata[0];
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [profiledata, setProfiledata] = useState();
 
    useEffect(() => {
     if(props?.id?.symbol){
+      setProfiledata(props?.id)
       setLoading(false)
     }
     else
@@ -40,60 +36,58 @@ export default function Company(props) {
     return <Box sx={{ display: 'flex' }}> <CircularProgress /> </Box>
   }
   return (
-    <Paper sx={{ p: 2, margin: '20px auto', flexGrow: 1}} >
+    <>
+    
+    <Paper sx={{ p: 2, margin: '20px auto', flexGrow: 1}} className='profile'>
       <Grid container spacing={2}>
         <Grid item>
           <ButtonBase sx={{ width: 128, height: 128 }}>
-            <Img alt="complex" src={temp.image} />
+          <a href={profiledata.website} target="_blank" className="namelink" rel="noreferrer"><Img alt="complex" src={profiledata.image} /></a>
+            
           </ButtonBase>
         </Grid>
         <Grid item xs={12} sm container>
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
             <Typography gutterBottom variant="h6" component="div">
-            <span className="content-bold" >{temp.symbol}</span>
+            <span className="content-bold" >{profiledata.symbol}</span>
               </Typography>
               <Typography gutterBottom variant="h6" component="div">
-              <span className="content-bold" >{temp.companyName}</span>
+              <a href={profiledata.website} target="_blank" className="namelink" rel="noreferrer">{profiledata.companyName}</a>
               </Typography>
               <Typography gutterBottom variant="subtitle1" component="div">
-                <span className="content-bold" >CEO:</span> {temp.ceo}
+                <span className="content-bold" >CEO:</span> {profiledata.ceo}
               </Typography>
               <Typography variant="body2" gutterBottom >
-              <span className="content-bold" > Industry: </span>{temp.industry}
+              <span className="content-bold" > Industry: </span>{profiledata.industry}
               </Typography>
 
               <Typography variant="body2" gutterBottom >
-              <span className="content-bold" > Exchange: </span>{temp.exchange}
+              <span className="content-bold" > Exchange: </span>{profiledata.exchange}
               </Typography>
 
               <Typography variant="body2" gutterBottom >
-              <span className="content-bold" > Average Volume: </span>{temp.volAvg}, <span className="content-bold" > Beta: </span>{temp.beta},<br/>
-              <span className="content-bold" > Range: </span>{temp.range}
+              <span className="content-bold" > Average Volume: </span>{profiledata.volAvg}, <span className="content-bold" > Beta: </span>{profiledata.beta},<br/>
+              <span className="content-bold" > Range: </span>{profiledata.range}
               </Typography>
-
-              <Typography variant="body2" gutterBottom  sx={{textAlign:'justify'}} className="fixwidth hide-scroll">
-             <span className="content-bold" > Description: </span>{temp.description}
+              <Typography variant="body2" gutterBottom  sx={{textAlign:'justify'}} className="discription">
+             <span className="content-bold" > Description: </span>{profiledata.description}
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
-              <span className="content-bold" > Address:  </span>{temp.address}, {temp.city}, {temp.state}-{temp.zip}, {temp.country}
+              <span className="content-bold" > Address:  </span>{profiledata.address}, {profiledata.city}, {profiledata.state}-{profiledata.zip}, {profiledata.country}
               </Typography>
 
-            </Grid>
-            <Grid item>
-              <Typography sx={{ cursor: 'pointer' }} variant="body2">
-                <a href={temp.website} target="_blank" rel="noreferrer">Open website</a>
-              </Typography>
             </Grid>
           </Grid>
           <Grid item>
             <Typography variant="subtitle1" component="div">
-              price:  {temp.price} {temp.currency}
+              price:  {profiledata.price} {profiledata.currency}
             </Typography>
           </Grid>
         </Grid>
       </Grid>
     </Paper>
+    </>
   );
 }

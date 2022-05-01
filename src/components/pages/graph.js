@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
-import faker from 'faker';
+import { Box, CircularProgress, Paper } from '@mui/material';
 
 ChartJS.register(
     CategoryScale,
@@ -20,6 +20,13 @@ export const options = {
     plugins: {
         legend: {
             position: 'top',
+            labels: {
+                font: {
+                    size: 20,
+                    weight:600,
+                    family:'Cambria, Cochin, Georgia, Times, Times New Roman,serif'
+                }
+            }
         },
         title: {
             display: false,
@@ -27,11 +34,6 @@ export const options = {
         },
     },
 };
-
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-
-//console.log(data,"d")
 
 export default function Graph(props) {
     const propdata = props.data
@@ -44,9 +46,7 @@ export default function Graph(props) {
     const [loading, setLoading] = useState(true);
 
 
-    //console.log(propdata, "graph data date")
-    //let dates = [];
-    //let closes = [];
+
 
     function processdata(pro) {
         for (let i in pro) {
@@ -59,18 +59,13 @@ export default function Graph(props) {
             setVolume(volume => [...volume, pro[i]['5. volume']])
 
 
-            //closes.push(pro[i]['4. close']);
+
         }
 
     }
-
-
     async function getgraphdata(prodata) {
         await processdata(prodata)
         setLoading(false)
-        //console.log(dates, "graph2 dates")
-        //console.log(closes, "graph2 close")
-
 
     }
     useEffect(() => {
@@ -119,21 +114,26 @@ export default function Graph(props) {
         ],
     }
 
-    //console.log(data2,"data2")
-
     if (loading) {
-        return <p>Loading...</p>
+        return <Box sx={{ display: 'flex' }}> <CircularProgress /> </Box>
     }
     return (
         <>
             <div>
+                <Paper className='chart-paper'>
                 <Line options={options} data={closedata} />
+                </Paper>
+               
             </div>
             <div>
+            <Paper className='chart-paper'>
                 <Bar options={options} data={lowhighdata} />
+                </Paper>
             </div>
             <div>
+            <Paper className='chart-paper'>
                 <Bar options={options} data={volumedata} />
+                </Paper>
             </div>
 
 
